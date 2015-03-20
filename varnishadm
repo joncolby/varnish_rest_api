@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "this is standard output $*"
+
+echo "this is standard error $*" >&2
