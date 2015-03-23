@@ -19,37 +19,41 @@ class Varnish
     #@binary = '/Users/jcolby/varnish-rest-api/varnishadm'
     #@binary = './varnishadm'
     @binary = '/usr/bin/varnishadm -T :6082 -S /home/vagrant/secret'
-
-
   end
   
   ### load yaml config  
   ### set defaults
-  
-  ### variables
-  
-  # secret key
-  # varnish version
-  # admin port
-  
-  
-  # ban list
+    
+  def varnish_major_version
+    varnishadm("banner").each do |d|
+      m = /^varnish-([0-9]+).*/.match(d)
+      unless m.nil? 
+        return m[1].to_i
+      end
+    end 
+  end
+
+  # banning has the effect of purging content
+  # https://www.varnish-software.com/static/book/Cache_invalidation.html#banning
+  def ban_all 
+    command = varnish_major_version >= 4 ?  'ban req.url ~ .' :  'ban.url .' 
+    result = varnishadm(command) 
+    JSON.pretty_generate({ 'message' => result ? "all urls have been banned" : result})
+  end
   
   def ping
     JSON.pretty_generate({ 'ping' => varnishadm("ping")})
   end
   
-  # ban all (purge)
-  
   # backend enable/disable
-  def set_health(backend,health)    
+  def set_health(backend,health,safe=true)    
     unless ["sick","auto"].include?(health)
       return JSON.pretty_generate({ 'error' => "invalid health '#{health}'. health must be 'sick' or 'auto'"})
     end
     
     backends_found = list_backends(:expression => backend)
 
-    if backends_found.size > 1
+    if safe && backends_found.size > 1
       return JSON.pretty_generate({ 'error' => "multiple backends found for pattern '#{backend}': " +  backends_found.collect { |b| b.backend_name }.join(',')})
     end
     
@@ -83,8 +87,8 @@ class Varnish
       backend.refs = match[3].to_s
       backend.admin = match[4].to_s
       backend.health = match[5].to_s
-
       #backends << (options[:json] ? backend.to_json : backend)
+
       backends << backend
     end
     options[:json] ? JSON.pretty_generate(backends.map { |o| Hash[o.each_pair.to_a] }) : backends
@@ -104,7 +108,9 @@ class Varnish
 
         output = Array.new 
         
-        unless wait_thr.value.success?
+        exit_status = wait_thr.value
+        
+        unless exit_status.success?
           #raise
           $stderr.puts "varnishadm exited with code #{exit_status.exitstatus}"
           while line = stderr.gets
@@ -133,7 +139,7 @@ class Varnish
     "instance #{@instance}"
   end
   
-  private :varnishadm
+  private :varnishadm, :varnish_major_version
   
 end
 
@@ -146,8 +152,10 @@ puts "="
 puts v.list_backends(:expression => "server3", :json=>true)
 puts "="
 puts v.list_backends(:expression => "server2",:json=>true) 
-#puts v.set_health("server3","sick")
-#puts v.set_health("server3","auto")
-#puts v.set_health("server","auto")
+puts v.set_health("server11","sick")
+puts v.set_health("server3","auto")
+puts v.set_health("server","auto",false)
 puts "="
 puts v.ping
+puts "="
+puts v.ban_all
