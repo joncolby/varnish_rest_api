@@ -31,8 +31,10 @@ end
 config_default = {
   :bind_ip => '0.0.0.0',
   :port => 4567,
+  :mgmt_port => 6082,
+  :mgmt_host => 'localhost',
   :secret => '/etc/varnish/secret',
-  :instance => nil,
+  :instance => "default",
   :environment => 'production',
   :use_zookeeper => false,
   :zookeeper_host => nil,
@@ -41,9 +43,9 @@ config_default = {
 
 config = config_default.merge!(config_file)
 
-varnish = Varnish.new(:instance => "myInstance")
+varnish = Varnish.new(:instance => config[:instance], :secret => config[:secret], :mgmt_port => [:mgmt_port], :mgmt_host => [:mgmt_host])
 
-# configuration
+# sinatra configuration
 set :bind, config[:bind_ip]
 set :port, config[:port]
   
