@@ -6,14 +6,20 @@ require 'ostruct'
 class Varnish
 
   def initialize(params = {})
+    @mgmt_port = params.fetch(:mgmt_port, 6082)
+    @mgmt_host = params.fetch(:mgmt_host, 'localhost')
     @instance = params.fetch(:instance, 'default')
-    @binary = '/usr/bin/varnishadm -T :6082 -S /home/vagrant/secret'
-    puts "instance: " + @instance.to_s
+    @environment = params.fetch(:environment, 'production')
+    @use_zookeeper = params.fetch(:use_zookeeper, false)
+    @zookeeper_host = params.fetch(:zookeeper_host, nil)
+    @zookeeper_basenode = params.fetch(:zookeeper_basenode, '/varnish')
+    @secret = params.fetch(:secret, '/etc/varnish/secret')
+    @varnishadm_path = params.fetch(:varnishadm_path, '/usr/bin/varnishadm')
+    @varnishadm = "#{@varnishadm_path.to_s} -T #{@mgmt_host.to_s}:#{@mgmt_port.to_s} -S #{@secret.to_s}"
+
+    puts "varnishadm command line: " + @varnishadm.to_s
   end
   
-  ### load yaml config  
-  ### set defaults
-    
   def output(result)
     result[:error].size > 0 ? result[:error] : result[:output]
   end
@@ -96,7 +102,7 @@ class Varnish
   
   def varnishadm(cmd)    
     begin
-      Open3.popen3(@binary + ' ' + cmd) do |stdin, stdout, stderr, wait_thr|        
+      Open3.popen3(@varnishadm + ' ' + cmd) do |stdin, stdout, stderr, wait_thr|        
 
         output = Array.new 
         error = Array.new

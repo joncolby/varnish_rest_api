@@ -1,6 +1,12 @@
 ---
-port: 10001
+port: 4567
 bind_ip: '0.0.0.0'
+secret: /home/vagrant/secret
+mgmt_port: 6082
+mgmt_host: localhost
+varnishadm_path: /usr/bin/varnishadm
+instance: default
+environment: production
 use_zookeeper: false
-zookeeper_host: 'zookeeper.domain.com'
-zookeeper_basenode: '/varnish'
+zookeeper_host: nil
+zookeeper_basenode: /varnish

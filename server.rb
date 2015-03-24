@@ -23,9 +23,9 @@ end
 
 config_file = Hash.new
 begin
-config_file = config_parsed.inject({}){|h,(k,v)| h[k.to_sym] = v; h}
+  config_file = config_parsed.inject({}){|h,(k,v)| h[k.to_sym] = v; h}
 rescue NoMethodError => e
-  puts "shit"
+  $stderr.puts "error parsing configuration yaml"
 end
 
 config_default = {
@@ -34,6 +34,7 @@ config_default = {
   :mgmt_port => 6082,
   :mgmt_host => 'localhost',
   :secret => '/etc/varnish/secret',
+  :varnishadm_path => '/usr/bin/varnishadm',
   :instance => "default",
   :environment => 'production',
   :use_zookeeper => false,
@@ -43,7 +44,11 @@ config_default = {
 
 config = config_default.merge!(config_file)
 
-varnish = Varnish.new(:instance => config[:instance], :secret => config[:secret], :mgmt_port => [:mgmt_port], :mgmt_host => [:mgmt_host])
+varnish = Varnish.new(:instance => config[:instance], \
+  :secret => config[:secret], \
+  :mgmt_port => config[:mgmt_port], \
+  :mgmt_host => config[:mgmt_host], \
+  :varnishadm_path => config[:varnishadm_path])
 
 # sinatra configuration
 set :bind, config[:bind_ip]
@@ -78,11 +83,13 @@ get '/ban' do
 end
 
 get '/:backend/in' do
-  params[:backend] + " in"
+  varnish.set_health(params[:backend],'auto')
+  redirect to('/list')
 end
 
 get '/:backend/out' do
-  params[:backend] + " out"
+  varnish.set_health(params[:backend],'sick')
+  redirect to('/list')
 end
 
 
