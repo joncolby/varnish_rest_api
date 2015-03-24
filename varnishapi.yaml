@@ -1,0 +1,6 @@
+---
+port: 10001
+bind_ip: '0.0.0.0'
+use_zookeeper: false
+zookeeper_host: 'zookeeper.domain.com'
+zookeeper_basenode: '/varnish'

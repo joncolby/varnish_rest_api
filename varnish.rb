@@ -5,11 +5,10 @@ require 'ostruct'
 
 class Varnish
 
-  def initialize(instance="default")
-    @instance = instance
-    #@binary = '/Users/jcolby/varnish-rest-api/varnishadm'
-    #@binary = './varnishadm'
+  def initialize(params = {})
+    @instance = params.fetch(:instance, 'default')
     @binary = '/usr/bin/varnishadm -T :6082 -S /home/vagrant/secret'
+    puts "instance: " + @instance.to_s
   end
   
   ### load yaml config  
