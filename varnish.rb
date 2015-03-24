@@ -2,15 +2,6 @@
 require 'open3'
 require 'json'
 require 'ostruct'
- 
-class Backend < OpenStruct
-#  def to_json
-#    table.to_json
-#  end
-#  def as_json(options = nil)
-#    super.as_json(options)
-#  end
-end
 
 class Varnish
 
@@ -24,8 +15,12 @@ class Varnish
   ### load yaml config  
   ### set defaults
     
+  def output(result)
+    result[:error].size > 0 ? result[:error] : result[:output]
+  end
+  
   def varnish_major_version
-    varnishadm("banner").each do |d|
+    varnishadm("banner")[:output].each do |d|
       m = /^varnish-([0-9]+).*/.match(d)
       unless m.nil? 
         return m[1].to_i
@@ -36,13 +31,13 @@ class Varnish
   # banning has the effect of purging content
   # https://www.varnish-software.com/static/book/Cache_invalidation.html#banning
   def ban_all 
-    command = varnish_major_version >= 4 ?  'ban req.url ~ .' :  'ban.url .' 
-    result = varnishadm(command) 
-    JSON.pretty_generate({ 'message' => result ? "all urls have been banned" : result})
+    command = varnish_major_version >= 4 ?  '\'ban req.url ~ .\'' :  '\'ban.url .\'' 
+    result = output(varnishadm(command))
+    JSON.pretty_generate({ command => result.size > 0 ? result : "command successful" })
   end
   
   def ping
-    JSON.pretty_generate({ 'ping' => varnishadm("ping")})
+    JSON.pretty_generate({ 'ping' => output(varnishadm("ping")) })
   end
   
   # backend enable/disable
@@ -74,9 +69,9 @@ class Varnish
       command += " #{options[:expression]}"
     end
     #puts "command => " + command
-    varnishadm(command).to_a.each_with_index do |line,i| 
+    varnishadm(command)[:output].to_a.each_with_index do |line,i| 
       next if i < 1
-      backend = Backend.new
+      backend = OpenStruct.new
       #server1(127.0.0.1,80) 1 probe Sick 0/5 
       #line = "server1(127.0.0.1,80) 1 probe Sick 0/5"
       components = line.squeeze.split
@@ -87,19 +82,17 @@ class Varnish
       backend.refs = match[3].to_s
       backend.admin = match[4].to_s
       backend.health = match[5].to_s
-      #backends << (options[:json] ? backend.to_json : backend)
-
       backends << backend
     end
     options[:json] ? JSON.pretty_generate(backends.map { |o| Hash[o.each_pair.to_a] }) : backends
   end
   
   def banner
-    JSON.pretty_generate({ 'banner' => varnishadm("banner")})
+    JSON.pretty_generate({ 'banner' => output(varnishadm("banner"))})
   end
   
   def status
-    JSON.pretty_generate({ 'status' => varnishadm("status")}) 
+    JSON.pretty_generate({ 'status' => output(varnishadm("status"))}) 
   end
   
   def varnishadm(cmd)    
@@ -107,6 +100,7 @@ class Varnish
       Open3.popen3(@binary + ' ' + cmd) do |stdin, stdout, stderr, wait_thr|        
 
         output = Array.new 
+        error = Array.new
         
         exit_status = wait_thr.value
         
@@ -116,7 +110,7 @@ class Varnish
           while line = stderr.gets
             $stderr.puts line
             if line.strip.length > 0
-              output << line.strip
+              error << line.strip
             end
           end
         end
@@ -126,7 +120,8 @@ class Varnish
             output << line.strip
           end
         end        
-        return output
+        #return output
+        return { :output => output, :error => error}
       end
       
     rescue Errno::ENOENT => e
@@ -139,23 +134,20 @@ class Varnish
     "instance #{@instance}"
   end
   
-  private :varnishadm, :varnish_major_version
+  private :varnishadm, :varnish_major_version, :output
   
 end
 
-v = Varnish.new
 
+=begin
+v = Varnish.new
 puts v.status
 puts "="
 puts v.banner
 puts "="
 puts v.list_backends(:expression => "server3", :json=>true)
 puts "="
-puts v.list_backends(:expression => "server2",:json=>true) 
-puts v.set_health("server11","sick")
-puts v.set_health("server3","auto")
-puts v.set_health("server","auto",false)
-puts "="
-puts v.ping
-puts "="
-puts v.ban_all
+puts v.list_backends
+=end
+
+
