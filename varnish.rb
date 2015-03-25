@@ -2,6 +2,9 @@
 require 'open3'
 require 'json'
 require 'ostruct'
+require 'zk'
+require 'socket'
+
 
 class Varnish
 
@@ -16,8 +19,25 @@ class Varnish
     @secret = params.fetch(:secret, '/etc/varnish/secret')
     @varnishadm_path = params.fetch(:varnishadm_path, '/usr/bin/varnishadm')
     @varnishadm = "#{@varnishadm_path.to_s} -T #{@mgmt_host.to_s}:#{@mgmt_port.to_s} -S #{@secret.to_s}"
+    @hostname = Socket.gethostname
 
     puts "varnishadm command line: " + @varnishadm.to_s
+
+    if @use_zookeeper && !@zookeeper_host.empty?
+      puts "configured to use use zookeeper"
+      begin
+        @zk = ZK.new(@zookeeper_host)
+      rescue RuntimeError => e
+          abort "problem connecting to zookeeper host: #{@zookeeper_host}"
+      end
+        
+      begin         
+        @zk.create(@zookeeper_basenode + '/' + @hostname, @hostname, :mode => :ephemeral_sequential)
+      rescue ZK::Exceptions::NoNode => zke
+        @zk.create(@zookeeper_basenode,'', :mode => :persistent)
+      end
+    end
+    
   end
   
   def output(result)
