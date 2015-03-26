@@ -1,5 +1,5 @@
 ---
-port: 10000
+port: 4567
 bind_ip: '0.0.0.0'
 secret: /home/vagrant/secret
 mgmt_port: 6082
@@ -7,6 +7,6 @@ mgmt_host: localhost
 varnishadm_path: /usr/bin/varnishadm
 instance: default
 environment: production
-use_zookeeper: true
-zookeeper_host: autodeploy38-2.mobile.rz:2181
+use_zookeeper: false
+zookeeper_host: autodeploy38-2:2181
 zookeeper_basenode: /varnish

@@ -1,0 +1,91 @@
+<html>
+<style>
+h2 {
+    text-align: center;
+    color: red;
+}
+h1 {
+    text-align: left;
+}
+table {
+    border-spacing: 5px;
+}
+tr:nth-child(even) {
+    background-color: #eee;
+}
+tr:nth-child(odd) {
+    background-color: #fff;
+}
+th {
+    text-align: left;
+    color: white;
+    background-color: black;
+} 
+</style>
+<% if status == 404 %>
+<h2>Error: <%= request.path_info %> is not a valid url</h2>
+<% end %>
+
+
+
+<table>
+<caption><h3>Varnish REST API help</h3></caption>
+  <tr>
+    <th>Method</th>
+    <th>URL</th>
+    <th>Description</th>
+    <th>Remarks</th>
+  </tr>
+  
+    <tr>
+    <td>GET</td>
+    <td>/list</td>
+    <td>list all backends</td>
+    <td>read-only</td>
+  </tr>
+  
+     <tr>
+    <td>GET</td>
+    <td>/ping</td>
+    <td>ping varnish process</td>
+    <td>read-only</td>
+  </tr>
+  <tr>
+    <td>GET</td>
+    <td>/banner</td>
+    <td>display varnish banner with version information</td>
+    <td>read-only</td>
+  </tr>
+  
+    <tr>
+    <td>GET</td>
+    <td>/status</td>
+    <td>display status of varnish process</td>
+    <td>read-only</td>
+  </tr>
+  
+      <tr>
+    <td>GET</td>
+    <td>/ban</td>
+    <td>ban all objects immediately</td>
+    <td>effectively purges objects. See <a href="https://www.varnish-cache.org/docs/3.0/tutorial/purging.html">here</a> and <a href="https://www.varnish-software.com/static/book/Cache_invalidation.html">here</a></td>
+  </tr>
+  
+   <tr>
+    <td>GET</td>
+    <td>/{backend}/in</td>
+    <td>sets backend health to "auto", allowing probe to decide if backend is healthy</td>
+    <td>use partial or complete backend name as it appears in VCL. The Rest API will not process request if more than one backend is found matching for the pattern</td>
+  </tr>
+   <tr>
+    <td>GET</td>
+    <td>/{backend}/out</td>
+    <td>sets backend health to "sick"</td>
+    <td>use partial or complete backend name as it appears in VCL. The Rest API will not process request if more than one backend is found matching for the pattern</td>    
+  </tr>
+<tr>
+</tr>
+</table>
+
+
+</html>

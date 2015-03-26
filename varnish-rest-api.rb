@@ -54,15 +54,34 @@ varnish = Varnish.new(:instance => config[:instance], \
   :varnishadm_path => config[:varnishadm_path])
 
 # sinatra configuration
-set :bind, config[:bind_ip]
-set :port, config[:port]
+configure do
+  set :root, File.dirname(__FILE__)
+  set :bind, config[:bind_ip]
+  set :port, config[:port]
+  set :server, %w[thin mongrel webrick]
+  set :show_exceptions, true
+end
   
 before do
-  content_type :txt
+  content_type :json
+end
+
+not_found do
+  content_type :html
+  @status = status.to_i
+  erb :help
+end
+
+helpers do
+end
+
+error do
+  'Sorry there was a nasty error - ' + env['sinatra.error'].name
 end
 
 get '/' do
-  "usage"
+  content_type :html
+  erb :help
 end
 
 get '/banner' do
@@ -85,17 +104,22 @@ get '/ban' do
   varnish.ban_all
 end
 
-get '/:backend/in' do
-  varnish.set_health(params[:backend],'auto')
-  redirect to('/list')
+get %r{^/(.*?)/(in|out)$} do  
+  backend = params[:captures].first
+  action = params[:captures].last
+  health = action == 'out' ? 'sick' : 'auto'
+  backends = varnish.set_health(backend,health)
+
+    if backends.empty?
+      content_type :html
+      halt 400, erb(:error, :locals => { :message => "No backend found for pattern #{backend}"}) 
+    elsif backends.class == Hash && backends.has_key?("error")
+      content_type :html
+      error = backends['error']
+      halt 400, erb(:error, :locals => { :message => error}) 
+    end
+  redirect to('/list') 
 end
-
-get '/:backend/out' do
-  varnish.set_health(params[:backend],'sick')
-  redirect to('/list')
-end
-
-
 
 =begin
 v = Varnish.new

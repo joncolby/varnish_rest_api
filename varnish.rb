@@ -66,19 +66,27 @@ class Varnish
   end
   
   # backend enable/disable
-  def set_health(backend,health,safe=true)    
+   def set_health(backend,health,options={})
+    default_options = {
+     :safe => true,
+     :json => false
+     }    
+    options = default_options.merge!(options)
+
     unless ["sick","auto"].include?(health)
-      return JSON.pretty_generate({ 'error' => "invalid health '#{health}'. health must be 'sick' or 'auto'"})
+      error = { 'error' => "invalid health '#{health}'. health must be 'sick' or 'auto'"}
+      return options[:json] ? JSON.pretty_generate(error) : error 
     end
     
     backends_found = list_backends(:expression => backend)
 
-    if safe && backends_found.size > 1
-      return JSON.pretty_generate({ 'error' => "multiple backends found for pattern '#{backend}': " +  backends_found.collect { |b| b.backend_name }.join(',')})
+    if options[:safe] && backends_found.size > 1
+      error = { 'error' => "multiple backends found for pattern '#{backend}': " +  backends_found.collect { |b| b.backend_name }.join(',')}
+      return  options[:json] ? JSON.pretty_generate(error) : error
     end
     
     varnishadm("backend.set_health #{backend} #{health}")    
-    list_backends(:expression => backend, :json => true)
+    list_backends(:expression => backend, :json => options[:json])
   end
       
   def list_backends(options={})
