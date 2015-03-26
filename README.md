@@ -48,13 +48,11 @@ zookeeper_basenode: /varnish
 
 ### RESTful API 
  
- 
-Method | URL | Description | Remarks
------------- | ------------- | ------------
-GET |/list | list all backends | read-only
-GET |/ping| ping varnish process | read-only
-GET |/banner |display varnish banner with version information | read-only
-GET |/status | display status of varnish process | read-only
-GET |/ban | ban all objects immediately |effectively purges objects. See varnish [documentation](<https://www.varnish-cache.org/docs/3.0/tutorial/purging.html>)
-GET |/{backend}/in | sets backend health to "auto", allowing probe to decide if backend is healthy | use partial or complete backend name as it appears in VCL. The Rest API will not process request if more than one backend is found matching for the pattern
-GET |/{backend}/out | sets backend health to "sick" |use partial or complete backend name as it appears in VCL. The Rest API will not process request if more than one backend is found matching for the pattern
+
+
+
+| sfa  | sdfg | sdfg | sdfg | sdfg |
+|------|------|------|------|------|
+| asfd | sf   | sdfg | sdfg | sfg  |
+| asdf | asdf | sfdg | sdfg | sdfg |
+| asdf | sfdg | sfdg | sfg  |      |
