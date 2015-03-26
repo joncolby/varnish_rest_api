@@ -50,9 +50,12 @@ zookeeper_basenode: /varnish
  
 
 
-
-| sfa  | sdfg | sdfg | sdfg | sdfg |
-|------|------|------|------|------|
-| asfd | sf   | sdfg | sdfg | sfg  |
-| asdf | asdf | sfdg | sdfg | sdfg |
-| asdf | sfdg | sfdg | sfg  |      |
+| Method  | Url | Description | Remarks | 
+|------|------|------|------|
+| GET | /list   | sdfg | sdfg |
+| GET | /ping | sfdg | sdfg | 
+| GET | /banner | sfdg | sfg  |
+| GET | /status | sfdg | sfg  | 
+| GET | /ban | sfdg | sfg  | 
+| GET | /*backend*/in | sfdg | sfg  |  
+| GET | /*backend*/out | sfdg | sfg  |  
