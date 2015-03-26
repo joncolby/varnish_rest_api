@@ -52,10 +52,10 @@ zookeeper_basenode: /varnish
 
 | Method  | Url | Description | Remarks | 
 |------|------|------|------|
-| GET | /list   | sdfg | sdfg |
-| GET | /ping | sfdg | sdfg | 
-| GET | /banner | sfdg | sfg  |
-| GET | /status | sfdg | sfg  | 
-| GET | /ban | sfdg | sfg  | 
+| GET | /list   | list all backends | read-only |
+| GET | /ping | ping varnish process  | read-only | 
+| GET | /banner | display varnish banner with version information | read-only |
+| GET | /status | display status of varnish process | read-only | 
+| GET | /ban | ban all objects immediately | effectively purges objects. See varnish [documentation](<https://www.varnish-cache.org/docs/3.0/tutorial/purging.html>) | 
 | GET | /*backend*/in | sfdg | sfg  |  
 | GET | /*backend*/out | sfdg | sfg  |  
