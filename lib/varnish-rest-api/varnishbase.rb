@@ -41,7 +41,7 @@ class VarnishBase
   end
   
   def output(result)
-    result[:error].size > 0 ? result[:error] : result[:output]
+    result[:error].empty? ? result[:output] : result[:error]
   end
   
   def varnish_major_version
@@ -50,7 +50,8 @@ class VarnishBase
       unless m.nil? 
         return m[1].to_i
       end
-    end 
+    end
+    return 0 
   end
 
   # banning has the effect of purging content
@@ -58,9 +59,10 @@ class VarnishBase
   def ban_all 
     command = varnish_major_version >= 4 ?  '\'ban req.url ~ .\'' :  '\'ban.url .\'' 
     result = output(varnishadm(command))
-    JSON.pretty_generate({ command => result.size > 0 ? result : "command successful" })
+    JSON.pretty_generate({ command => result.empty? ? "command successful" : result })
   end
   
+  # ping
   def ping
     JSON.pretty_generate({ 'ping' => output(varnishadm("ping")) })
   end
@@ -88,7 +90,8 @@ class VarnishBase
     varnishadm("backend.set_health #{backend} #{health}")    
     list_backends(:expression => backend, :json => options[:json])
   end
-      
+   
+  # list backends   
   def list_backends(options={})
    default_options = {
     :expression => nil,
@@ -101,8 +104,16 @@ class VarnishBase
     unless options[:expression].nil? || options[:expression].empty?
       command += " #{options[:expression]}"
     end
+    
+    varnishadm_result = varnishadm(command)
     #puts "command => " + command
-    varnishadm(command)[:output].to_a.each_with_index do |line,i| 
+    
+    unless varnishadm_result[:error].empty?
+      return options[:json] ? JSON.pretty_generate(varnishadm_result[:error]) : varnishadm_result[:error]
+    end
+    
+    varnishadm_result[:output].to_a.each_with_index do |line,i|
+    #varnishadm(command)[:output].to_a.each_with_index do |line,i| 
       next if i < 1
       backend = OpenStruct.new
       #server1(127.0.0.1,80) 1 probe Sick 0/5 
@@ -120,21 +131,23 @@ class VarnishBase
     options[:json] ? JSON.pretty_generate(backends.map { |o| Hash[o.each_pair.to_a] }) : backends
   end
   
+  # Display the varnish banner
   def banner
     JSON.pretty_generate({ 'banner' => output(varnishadm("banner"))})
   end
   
+  # Display the current status of the varnish process
   def status
     JSON.pretty_generate({ 'status' => output(varnishadm("status"))}) 
   end
   
-  def varnishadm(cmd)    
+  # Run the varnishadm command and capture and return stdout,stderr
+  def varnishadm(cmd)  
+    output = Array.new 
+    error = Array.new  
     begin
       Open3.popen3(@varnishadm + ' ' + cmd) do |stdin, stdout, stderr, wait_thr|        
 
-        output = Array.new 
-        error = Array.new
-        
         exit_status = wait_thr.value
         
         unless exit_status.success?
@@ -153,14 +166,15 @@ class VarnishBase
             output << line.strip
           end
         end        
-        #return output
-        return { :output => output, :error => error}
       end
       
     rescue Errno::ENOENT => e
       $stderr.puts "error running varnishadm: #{e.message}"
-      return []
-    end      
+      error << "error running varnishadm: #{e.message}"
+      output << "error running varnishadm: #{e.message}"
+    end
+    
+    return { :output => output, :error => error}      
   end
 
   def to_s

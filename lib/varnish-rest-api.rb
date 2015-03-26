@@ -29,6 +29,7 @@ rescue NoMethodError => e
   $stderr.puts "error parsing configuration yaml"
 end
 
+# default configuration
 config_default = {
   :bind_ip => '0.0.0.0',
   :port => 4567,
@@ -80,31 +81,40 @@ error do
   'Sorry there was a nasty error - ' + env['sinatra.error'].name
 end
 
-get '/' do
+['/', '/help', '/usage'].each do |route|
+get route do
   content_type :html
   erb :help
 end
+end
 
+# display the varnish banner containing varnish version information
 get '/banner' do
   varnish.banner
 end
 
+# run varnishadm ping call to varnish
 get '/ping' do
   varnish.ping
 end
 
+# report the status of the varnish process
 get '/status' do
   varnish.status
 end
 
+# display all backends and state
 get '/list' do
   varnish.list_backends(:json => true)
 end
 
+# purge cache objects using the ban feature
 get '/ban' do
   varnish.ban_all
 end
 
+# set the health of a backend.  Acceptable actions are "sick" and "auto". Auto indicates the varnish probe should decide whether to send traffic to this backend based on probe health
+# only one backend at a time can be changed. This is a safety feature due to varnish-cli greedy and unpredictable expression pattern matching.
 get %r{^/(.*?)/(in|out)$} do  
   backend = params[:captures].first
   action = params[:captures].last
