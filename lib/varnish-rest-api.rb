@@ -1,14 +1,15 @@
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-  
-require 'sinatra'
-require 'varnish'
+require 'sinatra/base'
+require 'varnish-rest-api/varnishbase'
 require 'yaml'
 
-CONFIG_PATHS = [ '/etc/varnishapi/varnishapi.yaml', ENV['HOME'] + '/varnishapi.yaml', File.dirname(__FILE__) + '/varnishapi.yaml']
+class VarnishRestApi < Sinatra::Application
+  
+CONFIG_FILE = "varnish-rest-api.yaml"
+CONFIG_PATHS = [ '/etc/' + CONFIG_FILE, ENV['HOME'] + '/' + CONFIG_FILE , File.dirname(__FILE__) + '/' + CONFIG_FILE ]
 CONFIG = CONFIG_PATHS.detect {|config| File.file?(config) }
   
 if !CONFIG
-  $stderr.puts "no configuration file found paths: " + CONFIG_PATHS.join(',')
+  $stderr.puts "no configuration file found in paths: " + CONFIG_PATHS.join(',')
   exit!
 else
   puts "using configuration file: " + CONFIG
@@ -44,7 +45,7 @@ config_default = {
 
 config = config_default.merge!(config_file)
 
-varnish = Varnish.new(:instance => config[:instance], \
+varnish = VarnishBase.new(:instance => config[:instance], \
   :zookeeper_host => config[:zookeeper_host], \
   :use_zookeeper => config[:use_zookeeper], \
   :zookeeper_basenode => config[:zookeeper_basenode], \
@@ -138,3 +139,5 @@ puts v.ping
 puts "="
 puts v.ban_all
 =end
+run! if app_file == $0
+end

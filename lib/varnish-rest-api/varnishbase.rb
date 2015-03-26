@@ -6,7 +6,7 @@ require 'zk'
 require 'socket'
 
 
-class Varnish
+class VarnishBase
 
   def initialize(params = {})
     @mgmt_port = params.fetch(:mgmt_port, 6082)
