@@ -38,7 +38,6 @@ config_default = {
   :secret => '/etc/varnish/secret',
   :varnishadm_path => '/usr/bin/varnishadm',
   :instance => "default",
-  :environment => 'production',
   :use_zookeeper => false,
   :zookeeper_host => nil,
   :zookeeper_basenode => '/varnish'  

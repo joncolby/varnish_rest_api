@@ -12,7 +12,6 @@ class VarnishBase
     @mgmt_port = params.fetch(:mgmt_port, 6082)
     @mgmt_host = params.fetch(:mgmt_host, 'localhost')
     @instance = params.fetch(:instance, 'default')
-    @environment = params.fetch(:environment, 'production')
     @use_zookeeper = params.fetch(:use_zookeeper, false)
     @zookeeper_host = params.fetch(:zookeeper_host, nil)
     @zookeeper_basenode = params.fetch(:zookeeper_basenode, '/varnish')

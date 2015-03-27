@@ -6,7 +6,6 @@ mgmt_port: 6082
 mgmt_host: localhost
 varnishadm_path: /usr/bin/varnishadm
 instance: default
-environment: production
 use_zookeeper: false
 zookeeper_host: autodeploy38-2:2181
 zookeeper_basenode: /varnish

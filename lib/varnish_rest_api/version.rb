@@ -1,3 +1,3 @@
-module varnish-rest-api
-      VERSION = "0.0.1"
+module VarnishRestApi
+  VERSION = "0.0.2"
 end
