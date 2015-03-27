@@ -1,10 +1,10 @@
 require 'sinatra/base'
-require 'varnish-rest-api/varnishbase'
+require 'varnish_rest_api/varnish_base'
 require 'yaml'
 
 class VarnishRestApi < Sinatra::Application
   
-CONFIG_FILE = "varnish-rest-api.yaml"
+CONFIG_FILE = "varnish_rest_api.yaml"
 CONFIG_PATHS = [ '/etc/' + CONFIG_FILE, ENV['HOME'] + '/' + CONFIG_FILE , File.dirname(__FILE__) + '/' + CONFIG_FILE ]
 CONFIG = CONFIG_PATHS.detect {|config| File.file?(config) }
   
