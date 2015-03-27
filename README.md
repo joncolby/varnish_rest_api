@@ -2,7 +2,7 @@
 
 ## Overview
 
-A small RESTful HTTP API for [Varnish](<https://www.varnish-cache.org>) written with [Sinatra](<http://www.sinatrarb.com/intro.html>).  It is meant to be run on the varnish node(s) since it executes varnishadm on the node.  It can be started as a stand-alone server using Thin, and is rack-aware.  
+A small RESTful HTTP API for [Varnish](<https://www.varnish-cache.org>) written with [Sinatra](<http://www.sinatrarb.com/intro.html>).  It is designed to be run on the varnish node(s) since it executes varnishadm on the varnish node itself.  It can be started as a stand-alone server using Thin, or as a rack-aware application.  
 
 #### Features
 
