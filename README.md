@@ -11,9 +11,9 @@ A small RESTful HTTP API for [Varnish](<https://www.varnish-cache.org>) written 
 * configurable with a yaml configuration file and sane defaults
 
 
-### Getting Started
+## Getting Started
 
-#### Installing
+### Installing
 
 *NOTE: It is recommended to use a ruby version manager such as [rvm](<https://rvm.io/>) instead of installing with the system ruby. With a ruby version manager, you can prevent "contaminating" your system-level ruby installation by creating an isolated ruby environment independent of system-installed ruby libraries. Plus, on some systems, installing gems at the system level may require root privileges.*
 
@@ -21,9 +21,12 @@ A small RESTful HTTP API for [Varnish](<https://www.varnish-cache.org>) written 
 gem install varnish_rest_api
 ```
 
-#### Running
+### Running
 
-An executable script is included in the gem and will be added to your $PATH after installation. To run as a standalone ruby executable, using Thin or WEBrick. This method is suitable for trying out the rest-api :
+
+#### Standalone mode (suitable for trying it out)
+
+An executable script is included in the gem and will be added to your $PATH after installation. The standalone executable uses Thin/WEBrick.
 
 ```
 $ varnishrestapi.rb
@@ -36,13 +39,25 @@ varnishadm command line: /usr/bin/varnishadm -T localhost:6082 -S /home/vagrant/
 [2015-03-27 14:17:58] INFO  WEBrick::HTTPServer#start: pid=14591 port=10001
 ```
 
+#### Rackup
+
+```
+TODO
+```
+#### Example using Nginx/Passenger
+
+```
+TODO
+```
+
+### Usage Documentation
 The usage documentation is available at the root context:
 
 ```
 http://your-ip-address:10001/
 ```
 
-#### WORD OF WARNING
+### WORD OF WARNING!
 
 This small web application is meant to run in an controlled environment and offers no encryption or authentication.  Anyone who can access the Rest API can potentially remove all of your varnish backends or overload your vanish process with calls to the "varnishadm" command. Use at your own risk!
 
@@ -67,7 +82,7 @@ $gem contents varnish_rest_api
 ```
 
 
-*(defaults which are configured in the application)*
+*(defaults configured in the application)*
 ```
 ---
 port: 10001
@@ -84,7 +99,7 @@ zookeeper_basenode: /varnish
 ```
 
 
-### RESTful API 
+### RESTful API Actions
  
 
 
