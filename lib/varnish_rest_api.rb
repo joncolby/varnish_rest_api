@@ -46,6 +46,7 @@ config_default = {
 config = config_default.merge!(config_file)
 
 varnish = VarnishBase.new(:instance => config[:instance], \
+  :port => config[:port], \
   :zookeeper_host => config[:zookeeper_host], \
   :use_zookeeper => config[:use_zookeeper], \
   :zookeeper_basenode => config[:zookeeper_basenode], \

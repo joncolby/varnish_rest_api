@@ -5,11 +5,11 @@ require 'ostruct'
 require 'zk'
 require 'socket'
 
-
 class VarnishBase
 
   def initialize(params = {})
     @mgmt_port = params.fetch(:mgmt_port, 6082)
+    @port = params.fetch(:port, 4567)
     @mgmt_host = params.fetch(:mgmt_host, 'localhost')
     @instance = params.fetch(:instance, 'default')
     @use_zookeeper = params.fetch(:use_zookeeper, false)
@@ -30,10 +30,13 @@ class VarnishBase
           abort "problem connecting to zookeeper host: #{@zookeeper_host}"
       end
         
-      begin         
-        @zk.create(@zookeeper_basenode + '/' + @hostname, @hostname, :mode => :ephemeral_sequential)
+      begin  
+        node = @zookeeper_basenode + '/' + @hostname  
+        # if the node exists, delete it since it is probably not from our zk session  
+        @zk.delete(node,:ignore => [:no_node,:not_empty,:bad_version])  
+        @zk.create(node,"#{@hostname}:#{@port}", :mode => :ephemeral_sequential, :ignore => [:no_node,:not_empty,:bad_version])
       rescue ZK::Exceptions::NoNode => zke
-        @zk.create(@zookeeper_basenode,'', :mode => :persistent)
+        $stderr.puts "something went wrong creating the zookeeper node #{node}: " + zke.message
       end
     end
     
