@@ -200,6 +200,7 @@ This small web application is meant to run in an controlled environment and offe
 | Method  | Url | Description | Remarks | 
 |------|------|------|------|
 | GET | /list   | list all backends | read-only |
+| GET | /list/*backend*   | list backends matching pattern *backend* | read-only |
 | GET | /ping | ping varnish process  | read-only | 
 | GET | /banner | display varnish banner with version information | read-only |
 | GET | /status | display status of varnish process | read-only | 

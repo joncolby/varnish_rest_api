@@ -108,6 +108,12 @@ get '/list' do
   varnish.list_backends(:json => true)
 end
 
+# display backends based on expression
+get %r{^/list/(.*?)$} do
+  expression = params[:captures].first
+  varnish.list_backends(:json => true, :expression => expression)  
+end
+
 # purge cache objects using the ban feature
 get '/ban' do
   varnish.ban_all
@@ -129,7 +135,10 @@ get %r{^/(.*?)/(in|out)$} do
       error = backends['error']
       halt 400, erb(:error, :locals => { :message => error}) 
     end
-  redirect to('/list') 
+    
+  status, headers, body = call! env.merge("PATH_INFO" => "/list/#{backend}")
+  [status, headers, body]
+  
 end
 
 =begin
