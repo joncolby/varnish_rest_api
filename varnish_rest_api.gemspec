@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jcolby@team.mobile.de"]
   spec.summary       = %q{A sinatra rest api for varnish.}
   spec.description   = %q{A restful http api for setting backend health, banning cache objects and getting status information. Executes varnishadm via http rest calls.}
-  spec.homepage      = "http://rubygems.org/gems/varnish_rest_api"
+  spec.homepage      = "https://github.com/joncolby/varnish_rest_api"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
