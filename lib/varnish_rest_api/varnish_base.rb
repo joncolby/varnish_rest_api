@@ -4,9 +4,10 @@ require 'json'
 require 'ostruct'
 require 'zk'
 require 'socket'
+require 'varnish_rest_api/version'
 
 class VarnishBase
-
+  
   def initialize(params = {})
     @mgmt_port = params.fetch(:mgmt_port, 6082)
     @port = params.fetch(:port, 4567)
@@ -20,6 +21,7 @@ class VarnishBase
     @varnishadm = "#{@varnishadm_path.to_s} -T #{@mgmt_host.to_s}:#{@mgmt_port.to_s} -S #{@secret.to_s}"
     @hostname = Socket.gethostname
 
+    puts "varnish_rest_api version #{VarnishRestApiVersion::VERSION}"
     puts "varnishadm command line: " + @varnishadm.to_s
 
     if @use_zookeeper && !@zookeeper_host.empty?
