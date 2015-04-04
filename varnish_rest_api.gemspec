@@ -5,7 +5,7 @@ require 'varnish_rest_api/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "varnish_rest_api"
-  spec.version       = VarnishRestApi::VERSION
+  spec.version       = VarnishRestApiVersion::VERSION
   spec.authors       = ["Jonathan Colby"]
   spec.email         = ["jcolby@team.mobile.de"]
   spec.summary       = %q{A sinatra rest api for varnish.}
