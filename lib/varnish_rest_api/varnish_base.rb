@@ -34,6 +34,7 @@ class VarnishBase
         node = @zookeeper_basenode + '/' + @hostname  
         # if the node exists, delete it since it is probably not from our zk session  
         @zk.delete(node,:ignore => [:no_node,:not_empty,:bad_version])  
+        @zk.create(@zookeeper_basenode, :mode => :persistent, :ignore => [:no_node,:node_exists])
         @zk.create(node,"#{@hostname}:#{@port}", :mode => :ephemeral_sequential, :ignore => [:no_node,:not_empty,:bad_version])
       rescue ZK::Exceptions::NoNode => zke
         $stderr.puts "something went wrong creating the zookeeper node #{node}: " + zke.message
