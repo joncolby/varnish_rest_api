@@ -128,7 +128,7 @@ get %r{^/(.*?)/(in|out)$} do
   action = params[:captures].last
   health = action == 'out' ? 'sick' : 'auto'
 
-  if (params[:safe].blank?)
+  if (params[:safe].nil?)
     safe = true
   else
     if (params[:safe] =~ (/^(false|f|no|n|0)$/i))
