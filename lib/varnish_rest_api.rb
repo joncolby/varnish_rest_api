@@ -128,16 +128,16 @@ get %r{^/(.*?)/(in|out)$} do
   action = params[:captures].last
   health = action == 'out' ? 'sick' : 'auto'
 
-  if (!params[:safe].nil?)
+  if (params[:safe].blank?)
+    safe = true
+  else
     if (params[:safe] =~ (/^(false|f|no|n|0)$/i))
       safe = false
     else
       safe = true
-    end
-  else
-    safe = true    
+    end 
   end
-  backends = varnish.set_health(backend,health, safe)
+  backends = varnish.set_health(backend,health, :safe => safe)
 
     if backends.empty?
       content_type :html
