@@ -79,7 +79,7 @@ class VarnishBase
      :json => false
      }    
     options = default_options.merge!(options)
-
+            
     unless ["sick","auto"].include?(health)
       error = { 'error' => "invalid health '#{health}'. health must be 'sick' or 'auto'"}
       return options[:json] ? JSON.pretty_generate(error) : error 

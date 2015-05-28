@@ -127,7 +127,8 @@ get %r{^/(.*?)/(in|out)$} do
   backend = params[:captures].first
   action = params[:captures].last
   health = action == 'out' ? 'sick' : 'auto'
-  backends = varnish.set_health(backend,health)
+  safe = params[:safe].nil? ? options[:safe] : params[:safe]  
+  backends = varnish.set_health(backend,health, safe)
 
     if backends.empty?
       content_type :html
